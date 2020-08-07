@@ -24,7 +24,12 @@ export interface MasterOptions {
 export interface ServerCommand {
     type: string;
     [key: string]: any;
-}
+};
+
+export interface Dictionary<T> {
+    [key: string]: T;
+};
+
 export enum COLOR {
     Reset = "\x1b[0m",
     FgBlack = "\x1b[30m",

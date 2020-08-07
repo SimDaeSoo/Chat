@@ -1,5 +1,7 @@
+import axios, { AxiosResponse } from 'axios';
 import Server from "./Server";
-import { MasterOptions, LoggingOptions, COLOR, ServerCommand } from "../interfaces";
+import { cookieStringToObject } from '../utils';
+import { MasterOptions, LoggingOptions, COLOR } from "../interfaces";
 
 interface Dictionary<T> {
     [key: string]: T;
@@ -54,8 +56,23 @@ class Master {
             }
         });
 
-        this.server.connection.on('connection', (socket: SocketIO.Socket): void => {
-            this.server.log(socket);
+        // Auth by jwt
+        this.server.connection.on('connection', async (socket: SocketIO.Socket): Promise<void> => {
+            const { cookie }: Dictionary<string> = socket.handshake.headers;
+            const { jwt }: Dictionary<string> = cookieStringToObject(cookie);
+
+            if (!jwt) {
+                socket.disconnect();
+                return;
+            }
+
+            try {
+                const headers: Dictionary<string> = { Authorization: `bearer ${jwt}` };
+                const { data }: AxiosResponse = await axios.get(`http://localhost/api/users/me`, { headers });
+                console.log(data);
+            } catch {
+                socket.disconnect();
+            }
         });
     }
 

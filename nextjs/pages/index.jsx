@@ -4,13 +4,20 @@ import { observer, inject } from 'mobx-react';
 import { withTranslation } from "react-i18next";
 import { Button, Select, Tag } from 'antd';
 import { initialize } from '../utils';
-import UserTest from '../components/UserTest';
+import * as SocketIOClient from 'socket.io-client';
 
 @inject('environment', 'auth')
 @observer
 class Home extends React.Component {
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        const socket = SocketIOClient('localhost:1000');
+        socket.on('disconnect', () => {
+            this.logout();
+        });
     }
 
     login() {
@@ -64,7 +71,6 @@ class Home extends React.Component {
                         <Tag color='magenta'>{auth.user.username}</Tag>
                     </>
                 }
-                <UserTest test={'test'}></UserTest>
             </div>
         );
     }
