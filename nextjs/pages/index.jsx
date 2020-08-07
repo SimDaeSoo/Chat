@@ -16,7 +16,8 @@ class Home extends React.Component {
     componentDidMount() {
         const socket = SocketIOClient('localhost:1000');
         socket.on('disconnect', () => {
-            this.logout();
+            socket.disconnect();
+            socket.close();
         });
     }
 
@@ -43,10 +44,6 @@ class Home extends React.Component {
 
         return (
             <div>
-                <Button type='primary' onClick={() => { this.linkTo(`/new${environment.queryString}`) }}>
-                    New Page
-                    </Button>
-
                 {
                     !auth.hasPermission &&
                     <Button type='primary' onClick={this.login.bind(this)}>

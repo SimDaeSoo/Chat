@@ -21,14 +21,36 @@ export interface MasterOptions {
     serverOptions: ServerOptions;
     slavesOptions: ServerOptions;
 };
+export interface SlaveData {
+    ip: string;
+    socket: SocketIO.Socket;
+};
+
+export interface AuthUserData {
+    id: number;
+    username: string;
+    email: string;
+    provider: string;
+    confirmed: boolean,
+    role: {
+        id: number;
+        name: string;
+    };
+};
+
+export interface SocketUser {
+    user: AuthUserData;
+    socket: SocketIO.Socket;
+}
+
 export interface ServerCommand {
     type: string;
     [key: string]: any;
 };
 
-export interface Dictionary<T> {
-    [key: string]: T;
-};
+export type Dictionary<T> = {
+    [key in string | number]: T;
+};;
 
 export enum COLOR {
     Reset = "\x1b[0m",
