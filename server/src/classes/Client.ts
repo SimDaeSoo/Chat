@@ -15,7 +15,7 @@ class Client {
     }
 
     public connect(): void {
-        this.connection = SocketIOClient(this.connectionAddress);
+        this.connection = SocketIOClient(this.connectionAddress, { reconnection: false });
         this.connection.on('connect', (): void => {
             this.log(`┌───────────────────────────────────────────┐`);
             this.log(`│ Name        : ${this.name.padEnd(28)}│`);

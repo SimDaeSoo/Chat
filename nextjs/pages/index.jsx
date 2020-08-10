@@ -14,7 +14,7 @@ class Home extends React.Component {
     }
 
     componentDidMount() {
-        const socket = SocketIOClient('localhost:1000');
+        const socket = SocketIOClient('localhost:1000', { reconnection: false });
         socket.on('disconnect', () => {
             socket.disconnect();
             socket.close();
