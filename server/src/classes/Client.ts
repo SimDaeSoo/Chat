@@ -15,8 +15,8 @@ class Client {
     }
 
     public connect(): void {
-        this.connection = SocketIOClient(this.connectionAddress, { reconnection: false });
-        this.connection.on('connect', (): void => {
+        this.connection = SocketIOClient(this.connectionAddress);
+        this.connection.once('connect', (): void => {
             this.log(`┌───────────────────────────────────────────┐`);
             this.log(`│ Name        : ${this.name.padEnd(28)}│`);
             this.log(`│ Status      : ${COLOR.FgGreen}Connected${COLOR.Reset}                   │`);
@@ -24,7 +24,7 @@ class Client {
             this.log(`└───────────────────────────────────────────┘`);
         });
 
-        this.connection.on('disconnect', (): void => {
+        this.connection.once('disconnect', (): void => {
             this.log(`┌───────────────────────────────────────────┐`);
             this.log(`│ Name        : ${this.name.padEnd(28)}│`);
             this.log(`│ Status      : ${COLOR.FgRed}Disconnected${COLOR.Reset}                │`);
@@ -34,8 +34,8 @@ class Client {
     }
 
     public disconnect(): void {
-        this.connection.removeAllListeners();
-        this.connection.close();
+        this.connection?.removeAllListeners();
+        this.connection?.close();
     }
 
     public log(...message: any): void {

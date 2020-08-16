@@ -22,14 +22,21 @@ class Server {
     }
 
     public async open(): Promise<void> {
-        this.ip = await ip.v4();
+        try {
+            this.ip = await new Promise(async (resolve, reject): Promise<void> => {
+                const address = ip.v4();
+                setTimeout((): void => { address.cancel(); reject('error'); }, 1000);
+                resolve(await address);
+            });
+        } catch (e) {
+            this.ip = '127.0.0.1';
+        }
 
         return new Promise((resolve, reject): void => {
             this.httpServer = this.express.listen(this.port);
 
             this.httpServer.once('error', (err: Error): void => {
                 this.close();
-                setTimeout(() => this.open(), 1000);
                 reject();
             });
 
@@ -44,7 +51,6 @@ class Server {
                     this.log(`└───────────────────────────────────────────┘`);
                     resolve();
                 } catch (error) {
-                    this.log(error);
                     this.close();
                     reject();
                 }

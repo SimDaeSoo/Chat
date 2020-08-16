@@ -17,9 +17,13 @@ class Slave {
     }
 
     public async open(): Promise<void> {
-        await this.server.open();
-        this.client.connect();
-        this.setListener();
+        try {
+            await this.server.open();
+            this.client.connect();
+            this.setListener();
+        } catch (e) {
+            this.close();
+        }
     }
 
     public close(): void {
@@ -30,6 +34,7 @@ class Slave {
     private setListener(): void {
         this.client.connection.on('disconnect', (): void => {
             this.close();
+            setTimeout(this.open.bind(this), 1000);
         });
     }
 }

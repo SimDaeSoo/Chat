@@ -24,14 +24,22 @@ class Master {
     }
 
     private async initialize(): Promise<void> {
-        const { data }: AxiosResponse = await axios.get(`${API_ADDRESS}/servers`);
-        this.activatedSlaveAddresses = data.map((serverData: Dictionary<string>): string => serverData.ip);
+        try {
+            const { data }: AxiosResponse = await axios.get(`${API_ADDRESS}/servers`);
+            this.activatedSlaveAddresses = data.map((serverData: Dictionary<string>): string => serverData.ip);
+        } catch (e) {
+            this.activatedSlaveAddresses = ['127.0.0.1'];
+        }
     }
 
     public async open(): Promise<void> {
-        await this.server.open();
-        await this.slaves.open();
-        this.setListener();
+        try {
+            await this.server.open();
+            await this.slaves.open();
+            this.setListener();
+        } catch (e) {
+            this.close();
+        }
     }
 
     public close(): void {
@@ -54,6 +62,7 @@ class Master {
         const isVaild: boolean = this.isActivatedSlave(remoteAddress);
         if (isVaild) {
             this._slaves[socket.id] = { ip: remoteAddress, socket: socket };
+            this.slaves.log(this._slaves);
         } else {
             socket.disconnect();
         }
@@ -67,7 +76,6 @@ class Master {
             const headers: Dictionary<string> = { Authorization: `bearer ${jwt}` };
             const { data }: AxiosResponse = await axios.get(`${API_ADDRESS}/users/me`, { headers });
             this.addUser(socket, data);
-            console.log(this._users);
         } catch {
             socket.disconnect();
         }
