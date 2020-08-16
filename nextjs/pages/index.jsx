@@ -14,10 +14,12 @@ class Home extends React.Component {
     }
 
     componentDidMount() {
+        const { auth } = this.props;
         const socket = SocketIOClient('localhost:1000', { reconnection: false });
         socket.on('disconnect', () => {
             socket.disconnect();
             socket.close();
+            auth.logout();
         });
     }
 

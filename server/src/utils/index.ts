@@ -10,3 +10,13 @@ export function cookieStringToObject(cookie: string): Dictionary<string> {
         }
     }, {});
 }
+
+export function randomSeed(length: number): string {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result: string = '';
+    for (let i = 0; i < length; i++) {
+        const index: number = Math.round(Math.random() * (characters.length - 1))
+        result += characters[index];
+    }
+    return result;
+}

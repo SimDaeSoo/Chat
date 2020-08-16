@@ -23,7 +23,10 @@ export interface MasterOptions {
 };
 export interface SlaveData {
     ip: string;
+    port: number;
     socket: SocketIO.Socket;
+    users: Array<number | string>;
+    initialized: boolean;
 };
 
 export interface AuthUserData {
@@ -38,9 +41,12 @@ export interface AuthUserData {
     };
 };
 
-export interface SocketUser {
-    user: AuthUserData;
+export interface UserData {
+    slave?: SlaveData;
+    data: AuthUserData;
     socket: SocketIO.Socket;
+    status: USER_STATUS;
+    seed: string;
 }
 
 export interface ServerCommand {
@@ -50,7 +56,7 @@ export interface ServerCommand {
 
 export type Dictionary<T> = {
     [key in string | number]: T;
-};;
+};
 
 export enum COLOR {
     Reset = "\x1b[0m",
@@ -62,4 +68,9 @@ export enum COLOR {
     FgMagenta = "\x1b[35m",
     FgCyan = "\x1b[36m",
     FgWhite = "\x1b[37m"
-}
+};
+
+export enum USER_STATUS {
+    CONNECTED = 'CONNECTED',
+    SELECTED_CHANNEL = 'SELECTED_CHANNEL'
+};

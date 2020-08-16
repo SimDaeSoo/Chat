@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "characters",
+  "info": {
+    "name": "Character"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "character"
+    },
+    "name": {
+      "type": "string"
+    },
+    "exp": {
+      "type": "biginteger",
+      "default": "0"
+    }
+  }
+}

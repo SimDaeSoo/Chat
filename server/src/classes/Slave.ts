@@ -27,11 +27,21 @@ class Slave {
     }
 
     public close(): void {
+        // Save All Data...
         this.server.close();
         this.client.disconnect();
     }
 
     private setListener(): void {
+        this.server.connection.on('connection', this.userConnected.bind(this));
+        this.client.connection.on('connect', this.masterConnected.bind(this));
+    }
+
+    private async userConnected(socket: SocketIO.Socket): Promise<void> {
+    }
+
+    private masterConnected(): void {
+        this.client.connection.emit('initialize', this.server.ip, this.server.port);
         this.client.connection.on('disconnect', (): void => {
             this.close();
             setTimeout(this.open.bind(this), 1000);
