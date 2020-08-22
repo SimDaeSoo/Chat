@@ -21,6 +21,7 @@ class Home extends React.Component {
             socket.close();
             auth.logout();
         });
+        const socket2 = SocketIOClient('localhost:1002', { reconnection: false });
     }
 
     login() {
@@ -46,6 +47,9 @@ class Home extends React.Component {
 
         return (
             <div>
+                <Button type='primary' onClick={e => this.linkTo('/new')}>
+                    New
+                </Button>
                 {
                     !auth.hasPermission &&
                     <Button type='primary' onClick={this.login.bind(this)}>

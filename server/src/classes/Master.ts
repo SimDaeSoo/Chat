@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import Server from "./Server";
-import { cookieStringToObject, randomSeed } from '../utils';
+import { cookieStringToObject } from '../utils';
 import { MasterOptions, LoggingOptions, COLOR, Dictionary, SlaveData, UserData, AuthUserData, USER_STATUS } from "../interfaces";
 
 const API_ADDRESS: string = 'http://localhost/api';
@@ -35,6 +35,8 @@ class Master {
             await this.slaves.open();
             this.slaves.connection.on('connection', this.slaveConnected.bind(this));
             this.server.connection.on('connection', this.userConnected.bind(this));
+
+            this.activatedSlaveAddresses.push(this.server.ip);
         } catch (e) {
             this.close();
         }
@@ -107,10 +109,8 @@ class Master {
         try {
             const headers: Dictionary<string> = { Authorization: `bearer ${jwt}` };
             const { data }: AxiosResponse = await axios.get(`${API_ADDRESS}/users/me`, { headers });
-            const seed: string = `${randomSeed(20)}${Date.now()}`;
-            socket.emit('seed', seed);
 
-            const user: UserData = this.addUser(socket, data, seed);
+            const user: UserData = this.addUser(socket, data);
             this.setUserServerListener(user);
         } catch (e) {
             socket.disconnect();
@@ -120,12 +120,12 @@ class Master {
     private userDisconnected(user: UserData): void {
         if (user.slave) {
             // Slave 에서도 제거한다.
-            user?.slave.socket.emit('disconnectUser', { data: user.data, seed: user.seed });
+            user?.slave.socket.emit('disconnectUser', { data: user.data });
         }
 
         this.log('User Disconnected', {
             id: user.data.id,
-            seed: user.seed,
+            socket_id: user.socket.id,
             username: user.data.username,
             email: user.data.email,
             provider: user.data.provider,
@@ -135,16 +135,16 @@ class Master {
         this.removeUser(user);
     }
 
-    private addUser(socket: SocketIO.Socket, data: AuthUserData, seed: string): UserData {
+    private addUser(socket: SocketIO.Socket, data: AuthUserData): UserData {
         if (this._users[data.id]) {
             this._users[data.id].socket.disconnect();
             delete this._users[data.id];
         }
 
-        this._users[data.id] = { socket, data, status: USER_STATUS.CONNECTED, seed };
+        this._users[data.id] = { socket, data, status: USER_STATUS.CONNECTED };
         this.log('User Connected', {
             id: data.id,
-            seed,
+            socket_id: socket.id,
             username: data.username,
             email: data.email,
             provider: data.provider,

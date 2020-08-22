@@ -46,7 +46,6 @@ export interface UserData {
     data: AuthUserData;
     socket: SocketIO.Socket;
     status: USER_STATUS;
-    seed: string;
 }
 
 export interface ServerCommand {

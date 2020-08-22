@@ -1,6 +1,6 @@
 import Server from "./Server";
 import Client from "./Client";
-import { SlaveOptions, LoggingOptions, COLOR } from "../interfaces";
+import { SlaveOptions, LoggingOptions, COLOR, Dictionary } from "../interfaces";
 
 class Slave {
     private server!: Server;
@@ -32,12 +32,24 @@ class Slave {
         this.client.disconnect();
     }
 
+    private log(title: string, data: Dictionary<any>, color?: COLOR): void {
+        this.server.log(`┌─────────────────────────────────────────────────────┐`);
+        this.server.log(`│ ${color || COLOR.FgGreen}${title.padEnd(52)}${COLOR.Reset}│`);
+        for (const key in data) {
+            this.server.log(`│ ${key.padEnd(11)} : ${data[key].toString().padEnd(37)} │`);
+        }
+        this.server.log(`└─────────────────────────────────────────────────────┘`);
+    }
+
     private setListener(): void {
         this.server.connection.on('connection', this.userConnected.bind(this));
         this.client.connection.on('connect', this.masterConnected.bind(this));
     }
 
     private async userConnected(socket: SocketIO.Socket): Promise<void> {
+        this.log('User Connected', {
+            socket_id: socket.id
+        });
     }
 
     private masterConnected(): void {
